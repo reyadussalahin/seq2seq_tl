@@ -88,8 +88,10 @@ if __name__ == "__main__":
 
     # Uncomment below statements if you have already saved the model
 
-    # load_weights = tl.files.load_npz(name='model.npz')
-    # tl.files.assign_weights(load_weights, model_)
+    if os.path.isfile('model.npz'):
+    	load_weights = tl.files.load_npz(name='model.npz')
+    	tl.files.assign_weights(load_weights, model_)
+    	print('model weights loaded successfully...')
 
     optimizer = tf.optimizers.Adam(learning_rate=0.001)
     model_.train()
@@ -136,11 +138,11 @@ if __name__ == "__main__":
         print('Epoch [{}/{}]: loss {:.4f}'.format(epoch + 1, num_epochs, total_loss / n_iter))
 
         for seed in seeds:
-            print("Query >", seed)
+            print("Context: {}".format(seed))
             top_n = 3
             for i in range(top_n):
                 sentence = inference(seed, top_n)
-                print(" >", ' '.join(sentence))
+                print("Reply: {}".format(' '.join(sentence)))
 
         tl.files.save_npz(model_.all_weights, name='model.npz')
 
