@@ -108,45 +108,54 @@ if __name__ == "__main__":
                  'i see you dont deserve that',
                  'i hope no one is hurt',
                  'i love you']
-    for epoch in range(num_epochs):
-        model_.train()
-        trainX, trainY = shuffle(trainX, trainY, random_state=0)
-        total_loss, n_iter = 0, 0
-        for X, Y in tqdm(tl.iterate.minibatches(inputs=trainX, targets=trainY, batch_size=batch_size, shuffle=False), 
-                        total=n_step, desc='Epoch[{}/{}]'.format(epoch + 1, num_epochs), leave=False):
+    # for epoch in range(num_epochs):
+    #     model_.train()
+    #     trainX, trainY = shuffle(trainX, trainY, random_state=0)
+    #     total_loss, n_iter = 0, 0
+    #     for X, Y in tqdm(tl.iterate.minibatches(inputs=trainX, targets=trainY, batch_size=batch_size, shuffle=False), 
+    #                     total=n_step, desc='Epoch[{}/{}]'.format(epoch + 1, num_epochs), leave=False):
 
-            X = tl.prepro.pad_sequences(X)
-            _target_seqs = tl.prepro.sequences_add_end_id(Y, end_id=end_id)
-            _target_seqs = tl.prepro.pad_sequences(_target_seqs, maxlen=decoder_seq_length)
-            _decode_seqs = tl.prepro.sequences_add_start_id(Y, start_id=start_id, remove_last=False)
-            _decode_seqs = tl.prepro.pad_sequences(_decode_seqs, maxlen=decoder_seq_length)
-            _target_mask = tl.prepro.sequences_get_mask(_target_seqs)
+    #         X = tl.prepro.pad_sequences(X)
+    #         _target_seqs = tl.prepro.sequences_add_end_id(Y, end_id=end_id)
+    #         _target_seqs = tl.prepro.pad_sequences(_target_seqs, maxlen=decoder_seq_length)
+    #         _decode_seqs = tl.prepro.sequences_add_start_id(Y, start_id=start_id, remove_last=False)
+    #         _decode_seqs = tl.prepro.pad_sequences(_decode_seqs, maxlen=decoder_seq_length)
+    #         _target_mask = tl.prepro.sequences_get_mask(_target_seqs)
 
-            with tf.GradientTape() as tape:
-                ## compute outputs
-                output = model_(inputs = [X, _decode_seqs])
+    #         with tf.GradientTape() as tape:
+    #             ## compute outputs
+    #             output = model_(inputs = [X, _decode_seqs])
                 
-                output = tf.reshape(output, [-1, vocabulary_size])
-                ## compute loss and update model
-                loss = cross_entropy_seq_with_mask(logits=output, target_seqs=_target_seqs, input_mask=_target_mask)
+    #             output = tf.reshape(output, [-1, vocabulary_size])
+    #             ## compute loss and update model
+    #             loss = cross_entropy_seq_with_mask(logits=output, target_seqs=_target_seqs, input_mask=_target_mask)
 
-                grad = tape.gradient(loss, model_.all_weights)
-                optimizer.apply_gradients(zip(grad, model_.all_weights))
+    #             grad = tape.gradient(loss, model_.all_weights)
+    #             optimizer.apply_gradients(zip(grad, model_.all_weights))
             
-            total_loss += loss
-            n_iter += 1
+    #         total_loss += loss
+    #         n_iter += 1
 
-        # printing average loss after every epoch
-        print('Epoch [{}/{}]: loss {:.4f}'.format(epoch + 1, num_epochs, total_loss / n_iter))
+    #     # printing average loss after every epoch
+    #     print('Epoch [{}/{}]: loss {:.4f}'.format(epoch + 1, num_epochs, total_loss / n_iter))
 
-        for seed in seeds:
-            print("Context: {}".format(seed))
+        # for seed in seeds:
+        #     print("Context: {}".format(seed))
+        #     top_n = 3
+        #     for i in range(top_n):
+        #         sentence = inference(seed, top_n)
+        #         print("Reply: {}".format(' '.join(sentence)))
+
+
+        context = input('context: ')
+        while not context == 'exit' and not context == 'quit':
             top_n = 5
             for i in range(top_n):
-                sentence = inference(seed, top_n)
-                print("Reply: {}".format(' '.join(sentence)))
+                reply = inference(context, top_n)
+                print("reply: {}".format(' '.join(reply)))
 
-        tl.files.save_npz(model_.all_weights, name='model.npz')
+
+        # tl.files.save_npz(model_.all_weights, name='model.npz')
 
 
         
