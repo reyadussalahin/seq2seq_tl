@@ -1,6 +1,3 @@
-#! /usr/bin/python
-# -*- coding: utf-8 -*-
-
 import tensorflow as tf
 import tensorlayer as tl
 import numpy as np
@@ -8,6 +5,7 @@ from tensorlayer.cost import cross_entropy_seq, cross_entropy_seq_with_mask
 from tqdm import tqdm
 from sklearn.utils import shuffle
 from data.twitter import data
+from data.status import calculate_accuracy
 from tensorlayer.models.seq2seq import Seq2seq
 from tensorlayer.models.seq2seq_with_attention import Seq2seqLuongAttention
 import os
@@ -23,7 +21,6 @@ def initial_setup(data_corpus):
     validX = tl.prepro.remove_pad_sequences(validX.tolist())
     validY = tl.prepro.remove_pad_sequences(validY.tolist())
     return metadata, trainX, trainY, testX, testY, validX, validY
-
 
 
 if __name__ == "__main__":
@@ -58,7 +55,7 @@ if __name__ == "__main__":
 
     src_vocab_size = tgt_vocab_size = src_vocab_size + 2
 
-    num_epochs = 2
+    num_epochs = 20
     vocabulary_size = src_vocab_size
     
 
@@ -97,17 +94,16 @@ if __name__ == "__main__":
 
     optimizer = tf.optimizers.Adam(learning_rate=0.001)
     model_.train()
-
+    actual = []
+    pred = []
     seeds = ["happy birthday have a nice day",
                  "donald trump won last nights presidential debate according to snap online polls",
                  'this is wonderful',
                  'trump confusing rambling with answering again',
                  'what has happened',
-                 'how are you',
                  'oh hey i watched sportsball',
-                 'i see you dont deserve that',
-                 'i hope no one is hurt',
-                 'i love you']
+                 'i love you',
+                 'be sure to keep this event on your radar']
     for epoch in range(num_epochs):
         model_.train()
         trainX, trainY = shuffle(trainX, trainY, random_state=0)
@@ -136,8 +132,8 @@ if __name__ == "__main__":
             total_loss += loss
             n_iter += 1
 
-        # printing average loss after every epoch
-        print('Epoch [{}/{}]: loss {:.4f}'.format(epoch + 1, num_epochs, total_loss / n_iter))
+        # printing average loss and accuracy after every epoch
+        print('Epoch [{}/{}]: loss {:.4f} acc {:.4f}'.format(epoch + 1, num_epochs, total_loss / n_iter, calculate_accuracy(actual, pred)))
 
         for seed in seeds:
             print("Context: {}".format(seed))

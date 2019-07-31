@@ -1,6 +1,3 @@
-#! /usr/bin/python
-# -*- coding: utf-8 -*-
-
 import tensorflow as tf
 import tensorlayer as tl
 import numpy as np
@@ -145,19 +142,10 @@ if __name__ == "__main__":
         #     for i in range(top_n):
         #         sentence = inference(seed, top_n)
         #         print("Reply: {}".format(' '.join(sentence)))
-
-
-        context = input('context: ')
-        while not context == 'exit' and not context == 'quit':
-            top_n = 5
-            for i in range(top_n):
-                reply = inference(context, top_n)
-                print("reply: {}".format(' '.join(reply)))
-
-
         # tl.files.save_npz(model_.all_weights, name='model.npz')
-
-
-        
-    
-    
+    context = input('context: ')
+    while not context == 'exit' and not context == 'quit':
+        top_n = 5
+        for i in range(top_n):
+            reply = inference(context, top_n)
+            print("reply: {}".format(' '.join(reply)))
